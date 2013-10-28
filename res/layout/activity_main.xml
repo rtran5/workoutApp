@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/btn_find"
         android:layout_below="@+id/btn_find"
-        android:textSize="14sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/question"
@@ -97,17 +97,8 @@
         android:layout_below="@+id/checkBox4"
         android:text="CheckBox5" />
 
-    <CheckBox
-        android:id="@+id/checkBox6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/checkBox5"
-        android:layout_alignRight="@+id/checkBox5"
-        android:layout_below="@+id/checkBox5"
-        android:text="CheckBox6" />
-
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/textViewURL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/question"
@@ -120,10 +111,10 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_cancel"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignRight="@+id/textView2"
-        android:layout_below="@+id/textView2"
+        android:layout_above="@+id/btn_find"
+        android:layout_alignLeft="@+id/textViewURL"
+        android:layout_alignRight="@+id/textViewURL"
+        android:layout_below="@+id/textViewURL"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:fontFamily="6"
@@ -134,15 +125,6 @@
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
         android:textSize="10sp" />
-
-    <Button
-        android:id="@+id/btn_find"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/radioGroup1"
-        android:layout_below="@+id/radioGroup1"
-        android:layout_marginTop="32dp"
-        android:text="Find" />
 
     <Button
         android:id="@+id/btn_cancel"
@@ -173,5 +155,84 @@
         android:text="Add to LIst"
         android:textSize="14sp"
         android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_store"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_clear"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/checkBox5"
+        android:text="store to WebSvr"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/btn_get"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/btn_Show"
+        android:layout_alignRight="@+id/btn_Show"
+        android:layout_alignTop="@+id/btn_store"
+        android:text="get from WebSvr"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/btn_find"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/radioGroup1"
+        android:layout_below="@+id/radioGroup1"
+        android:layout_marginTop="26dp"
+        android:text="Find" />
+
+    <TextView
+        android:id="@+id/webLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBox5"
+        android:layout_alignTop="@+id/btn_get"
+        android:layout_toLeftOf="@+id/btn_get"
+        android:text="Workout Plan # (1 to 10):"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/webLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBox5"
+        android:layout_alignParentBottom="true"
+        android:ems="10"
+        android:height="10dp"
+        android:text="1"
+        android:textSize="10sp" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_startwo"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_cancel"
+        android:layout_alignLeft="@+id/radioGroup1"
+        android:layout_below="@+id/radioGroup1"
+        android:text="Tabata Workout"
+        android:textSize="10sp" />
+
+    <Button
+        android:id="@+id/btn_maint"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/btn_startwo"
+        android:layout_alignTop="@+id/btn_startwo"
+        android:layout_toRightOf="@+id/btn_startwo"
+        android:text="Set URL Port/Rep count"
+        android:textSize="10sp" />
 
 </RelativeLayout>

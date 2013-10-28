@@ -22,7 +22,7 @@ public class Helper {
 		try {
 			// Let's simulate a long-running network operation by keeping the
 			// current thread busy for a long amount of time
-			Thread.sleep(10);
+			Thread.sleep(11);
 			Log.d(tag, "done background operation "+ delay);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

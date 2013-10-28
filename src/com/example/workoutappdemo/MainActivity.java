@@ -7,12 +7,26 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,15 +46,20 @@ public class MainActivity extends Activity {
 	//TextView myWorkoutList_Label;
 	TextView myWorkoutList_;
 	CheckBox resultChkBox1_, resultChkBox2_, resultChkBox3_;
-	CheckBox resultChkBox4_, resultChkBox5_, resultChkBox6_;
+	CheckBox resultChkBox4_, resultChkBox5_;
 	private Button stopButton_;
 	private Button addButton_;
 	private Button clearButton_;
+	private Button storeButton_;
+	private Button getButton_;
+	private Button startwoButton_; //start WorkOut Button
+	private Button seturlButton_; //set URL Port Button
 	private static String tag = "Concurrency_Exercise";
-
+	private CharSequence data;
 	Helper helper_ = new Helper();
 	protected Runnable myUiUpdate;
-
+	private EditText webLocation_;
+	String wolist = "10";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,19 +68,21 @@ public class MainActivity extends Activity {
 		input_ = (RadioGroup) findViewById(R.id.radioGroup1);
 		goButton_ = (Button) findViewById(R.id.btn_find);
 		resultText_ = (TextView) findViewById(R.id.workout_info);
-		//myWorkoutList_Label = (TextView) findViewById(R.id.textView2);
+		webLocation_ =  (EditText) findViewById(R.id.webLocation);
 		myWorkoutList_ = (TextView) findViewById(R.id.textView1);
-		//findViewById(R.id.ListView);resultText_ = (TextView) findViewById(R.id.workout_info);
 		stopButton_ = (Button) findViewById(R.id.btn_cancel);
 		addButton_ = (Button) findViewById(R.id.btn_Show);
+		storeButton_ = (Button) findViewById(R.id.btn_store);
+		getButton_ = (Button) findViewById(R.id.btn_get);
+		startwoButton_ = (Button) findViewById(R.id.btn_startwo);
+		seturlButton_ = (Button) findViewById(R.id.btn_maint);
 		clearButton_ = (Button) findViewById(R.id.btn_clear);
 		resultChkBox1_ = (CheckBox) findViewById(R.id.checkBox1);
 		resultChkBox2_ = (CheckBox) findViewById(R.id.checkBox2);
 		resultChkBox3_ = (CheckBox) findViewById(R.id.checkBox3);
 		resultChkBox4_ = (CheckBox) findViewById(R.id.checkBox4);
 		resultChkBox5_ = (CheckBox) findViewById(R.id.checkBox5);
-		resultChkBox6_ = (CheckBox) findViewById(R.id.checkBox6);
-		
+			
 		stopButton_.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -70,10 +91,342 @@ public class MainActivity extends Activity {
 			}
 		});
 		// Call doConcurrencyWithAsyncTask
-		doConcurrencyWithAsyncTask();
+		doConcurrencyWithAsyncTaskStartWorkOut();  // start workout button with sensor
+		doConcurrencyWithAsyncTaskStoretoWebserver();  // store button to Web Server
+		doConcurrencyWithAsyncTaskGetfromWebserver();  // get button from Web Server
+		doConcurrencyWithAsyncTasksetURLPort();  // set URL and Port for the Web Server
+		doConcurrencyWithAsyncTaskWWW(); // find button with WWW
 	}
-	//***************************************************
-	public void doConcurrencyWithAsyncTask() {
+	/////////////////////////////////////////////////////////////////
+	public void doConcurrencyWithAsyncTaskStartWorkOut() {
+	/////////////////////////////////////////////////////////////////	
+
+		class NetworkTask extends AsyncTask<String, Void, String> {
+			// <your member variables>
+			Helper helper_;
+			NetworkTask(Helper h) {
+				helper_ = h;
+			}
+			// pass a "WorkOut list" to a new Start Workout screen playing music , ...
+			protected String doInBackground(String... wolist) {
+				helper_.doPotentiallyLongRunningBackgroundOperation(wolist[0]);
+					//***************************************************
+				data = myWorkoutList_.getText();
+				String[] wodata_ = data.toString().split("\n");
+				String[] temp = {" ", " ", " ", " ", " ", " "};
+				for (int i =0; i < wodata_.length ; i++)
+					{
+					temp[i] = wodata_[i];
+					Log.d(tag, "Workout List: " + temp[i]);
+					}
+				////////////////////////////////////////////
+				// Step 2: to call playing music sensor here
+				 Log.d(tag, "in startWO step 2 ...");
+				 //add here
+				
+				
+				
+					
+				return " ";
+			}
+			
+			protected void onPostExecute(String htmlResult) {
+				helper_.updateUserInterfaceWithResultFromNetwork();
+				
+				resultText_.setText("Playing music on next screen ..." );
+			}
+		}
+
+		OnClickListener listener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				///////////////////////////////////////////////////
+				// Step 1: to do Pop up Start Workout XML here
+				 Log.d(tag, "in startWO step 1 ...");
+				 
+				
+				
+				
+				startActivity(new Intent(MainActivity.this, WorkoutActivity.class).putExtra(wolist, myWorkoutList_.getText()));
+				
+				CharSequence locText_ = webLocation_.getText();
+				Log.d(tag, "locText_ = " + locText_); 
+								
+				// Define your NetworkTask here!
+				final NetworkTask myNetTask = new NetworkTask(helper_);
+
+				// Execute your NetworkTask here
+				myNetTask.execute(locText_.toString());
+			}
+		}; // end OnClickListener()
+
+		startwoButton_.setOnClickListener(listener);
+	}
+	////////////////////////////////////////////////////////////
+	public void doConcurrencyWithAsyncTaskStoretoWebserver() {
+	////////////////////////////////////////////////////////////
+
+		class NetworkTask extends AsyncTask<String, Void, String> {
+			// <your member variables>
+			Helper helper_;
+			NetworkTask(Helper h) {
+				helper_ = h;
+			}
+			// pass a "work out plan number" woplannum parameter to the web server
+			protected String doInBackground(String... woplannum) {
+				helper_.doPotentiallyLongRunningBackgroundOperation(woplannum[0]);
+				try {
+					//***************************************************
+					data = myWorkoutList_.getText();
+					String[] wodata_ = data.toString().split("\n");
+					String[] temp = {" ", " ", " ", " ", " ", " "};
+					for (int i =0; i < wodata_.length ; i++)
+						{
+						temp[i] = wodata_[i];
+						Log.d(tag, " temp" + temp[i]);
+						}
+					//String urls_ = urls[0];
+					
+					HttpClient client = new DefaultHttpClient();  
+										HttpPost request = new HttpPost("http://10.0.2.2:8080/data");
+					
+					List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+					nameValuePairs.add(new BasicNameValuePair("WorkoutPlanNum", woplannum[0]));
+					nameValuePairs.add(new BasicNameValuePair("WorkoutType1", temp[1]));
+					nameValuePairs.add(new BasicNameValuePair("WorkoutType2", temp[2]));
+					nameValuePairs.add(new BasicNameValuePair("WorkoutType3", temp[3])); 
+					nameValuePairs.add(new BasicNameValuePair("WorkoutType4", temp[4]));
+					nameValuePairs.add(new BasicNameValuePair("WorkoutType5", temp[5]));
+					UrlEncodedFormEntity entity;
+					entity = new UrlEncodedFormEntity(nameValuePairs);
+					request.setEntity(entity);
+					HttpResponse response = client.execute(request);
+				//do something with the response!
+					HttpEntity ent=response.getEntity();
+					InputStream postis=ent.getContent();
+					String contentAsString = readIt(postis, 150); //len = 150
+		
+					Log.d(tag, "The response from Data Servlet : " + contentAsString);	
+					return "";
+	                //return downloadUrl(urls[0]);
+	            } catch (IOException e) {
+	                return "Unable to retrieve web page. URL may be invalid.";
+	            }
+			}
+			
+			protected void onPostExecute(String htmlResult) {
+				helper_.updateUserInterfaceWithResultFromNetwork();
+				
+				resultText_.setText("Storing in Web Server is completed!" );
+			}
+		}
+
+		OnClickListener listener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Get the location from the UI
+				CharSequence locText_ = webLocation_.getText();
+				//String radioButtonSelected = "";
+				Log.d(tag, "locText_ = " + locText_); 
+								
+				// Define your NetworkTask here!
+				final NetworkTask myNetTask = new NetworkTask(helper_);
+
+				stopButton_.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// Cancel your NetworkTask here!
+						myNetTask.cancel(true);
+						resultText_.setText("Cancelled");
+					}
+				});
+				
+				clearButton_.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+							myWorkoutList_.setText("");
+					}
+				});
+				// Update the UI with the response
+				resultText_.setText("My workout plan " + locText_ + " is storing." );
+
+				// Execute your NetworkTask here
+				myNetTask.execute(locText_.toString());
+			}
+		}; // end OnClickListener()
+
+		storeButton_.setOnClickListener(listener);
+	}
+	
+	////////////////////////////////////////////////////////////
+	public void doConcurrencyWithAsyncTaskGetfromWebserver() {
+	////////////////////////////////////////////////////////////
+
+		class NetworkTask extends AsyncTask<String, Void, String> {
+			// <your member variables>
+			Helper helper_;
+			NetworkTask(Helper h) {
+				helper_ = h;
+			}
+			// pass a "work out plan number" woplannum parameter to the web server
+			protected String doInBackground(String... woplannum) {
+				helper_.doPotentiallyLongRunningBackgroundOperation(woplannum[0]);
+				Log.d(tag, " testing ");
+				try {
+					//***************************************************
+				
+					HttpClient client = new DefaultHttpClient();  
+					HttpGet request = new HttpGet("http://10.0.2.2:8080/data?WorkoutPlanNum="+woplannum[0]);
+					
+				
+					HttpResponse response = client.execute(request);
+					
+					//UrlEncodedFormEntity entity;
+					//entity = new UrlEncodedFormEntity(nameValuePairs);
+					//request.getEntity(entity);
+					
+				   //do something with the response!
+					HttpEntity ent=response.getEntity();
+					InputStream getis=ent.getContent();
+					String contentAsString1 = readIt(getis, 500); //len 
+		
+					Log.d(tag, "Get from Data Servlet : " + contentAsString1);	
+					return contentAsString1;
+	                //return downloadUrl(urls[0]);
+	            } catch (IOException e) {
+	                return "Unable to retrieve web page. URL may be invalid.";
+	            } 
+			}
+			
+			protected void onPostExecute(String htmlResult) {
+				helper_.updateUserInterfaceWithResultFromNetwork();
+				myWorkoutList_.setText(" ");
+				
+				//*****Parsing XML data*********
+				int startOfSpan = -1;
+				int i = 1;
+				String subHtml = "";
+				String extractedData = ""; 
+				//myWorkoutList_.setText(htmlResult);
+				
+				while ( (startOfSpan = htmlResult.indexOf("<WorkoutType>")) != -1) {
+					subHtml = htmlResult.substring(startOfSpan + "<WorkoutType>".length());
+					extractedData = subHtml.substring(0, subHtml.indexOf("</WorkoutType>"));
+					
+					myWorkoutList_.setText(myWorkoutList_.getText() + "\n" +extractedData);
+					
+					htmlResult = subHtml;
+				} 	
+				resultText_.setText("Getting from Web Server is completed!" );
+				
+			}
+		}
+
+		OnClickListener listener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Get the location from the UI
+				myWorkoutList_.setText(""); 
+				CharSequence locText_ = webLocation_.getText();
+				//String radioButtonSelected = "";
+				Log.d(tag, "locText_ = " + locText_); 
+								
+				// Define your NetworkTask here!
+				final NetworkTask myNetTask = new NetworkTask(helper_);
+
+				stopButton_.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// Cancel your NetworkTask here!
+						myNetTask.cancel(true);
+						resultText_.setText("Cancelled");
+					}
+				});
+				
+				clearButton_.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+							myWorkoutList_.setText("");
+					}
+				});
+				// Update the UI with the response
+				resultText_.setText("My workout plan " + locText_ + " is storing." );
+
+				// Execute your NetworkTask here
+				myNetTask.execute(locText_.toString());
+			}
+		}; // end OnClickListener()
+
+		getButton_.setOnClickListener(listener);
+	}
+	/////////////////////////////////////////////////////////////////
+	public void doConcurrencyWithAsyncTasksetURLPort() {
+	/////////////////////////////////////////////////////////////////	
+
+	/*	class NetworkTask extends AsyncTask<String, Void, String> {
+			// <your member variables>
+			Helper helper_;
+			NetworkTask(Helper h) {
+				helper_ = h;
+			}
+			// pass a "WorkOut list" to a new Start Workout screen playing music , ...
+			protected String doInBackground(String... wolist) {
+				helper_.doPotentiallyLongRunningBackgroundOperation(wolist[0]);
+					//***************************************************
+				data = myWorkoutList_.getText();
+				String[] wodata_ = data.toString().split("\n");
+				String[] temp = {" ", " ", " ", " ", " ", " "};
+				for (int i =0; i < wodata_.length ; i++)
+					{
+					temp[i] = wodata_[i];
+					Log.d(tag, "Workout List: " + temp[i]);
+					}
+				////////////////////////////////////////////
+				// Step 2: to call playing music sensor here
+				 Log.d(tag, "in startWO step 2 ...");
+				 //add here
+				
+				
+				
+					
+				return " ";
+			}
+			
+			protected void onPostExecute(String htmlResult) {
+				helper_.updateUserInterfaceWithResultFromNetwork();
+				
+				resultText_.setText("Setting URL and Port on next screen ..." );
+			}
+		}
+*/
+		OnClickListener listener = new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				///////////////////////////////////////////////////
+				// Step 1: to do Pop up Start Workout XML here
+				 Log.d(tag, "in start seturl step 1 ...");
+				 
+					
+				startActivity(new Intent(MainActivity.this, ThirdActivity.class));
+				
+				CharSequence locText_ = webLocation_.getText();
+				Log.d(tag, "locText_ = " + locText_); 
+								
+				// Define your NetworkTask here!
+				//final NetworkTask myNetTask = new NetworkTask(helper_);
+
+				// Execute your NetworkTask here
+				//myNetTask.execute(locText_.toString());
+			}
+		}; // end OnClickListener()
+
+		seturlButton_.setOnClickListener(listener);
+	}		
+	////////////////////////////////////////////////////////////////////	
+	public void doConcurrencyWithAsyncTaskWWW() {
+	////////////////////////////////////////////////////////////////////
 
 		class NetworkTask extends AsyncTask<String, Void, String> {
 			// <your member variables>
@@ -85,7 +438,8 @@ public class MainActivity extends Activity {
 			protected String doInBackground(String... urls) {
 				helper_.doPotentiallyLongRunningBackgroundOperation(urls[0]);
 				try {
-					Log.d(tag, "before downloading .. " + urls[0] );
+					//***************************************************
+				
 	                return downloadUrl(urls[0]);
 	            } catch (IOException e) {
 	                return "Unable to retrieve web page. URL may be invalid.";
@@ -95,7 +449,7 @@ public class MainActivity extends Activity {
 			protected void onPostExecute(String htmlResult) {
 				helper_.updateUserInterfaceWithResultFromNetwork();
 				
-				//*****Parsing HTML data**********
+				//*****Parsing XML data**********
 				int startOfSpan = -1;
 				int i = 1;
 				String subHtml = "";
@@ -116,9 +470,7 @@ public class MainActivity extends Activity {
            	          							break;
 					  case 5 : resultChkBox5_.setText(extractedData);
                       							break;
-					  case 6 : resultChkBox6_.setText(extractedData);
-                      							break;	                      
-					}
+					  }
 					
 					i++;
 					
@@ -155,9 +507,7 @@ public class MainActivity extends Activity {
 				resultChkBox4_.setText("");
 				resultChkBox5_.setChecked(false);
 				resultChkBox5_.setText("");
-				resultChkBox6_.setChecked(false);
-				resultChkBox6_.setText("");
-				
+								
 				// Define your NetworkTask here!
 				final NetworkTask myNetTask = new NetworkTask(helper_);
 
@@ -184,9 +534,7 @@ public class MainActivity extends Activity {
 							myWorkoutList_.setText(myWorkoutList_.getText() + "\n" +resultChkBox4_.getText());
 						if(resultChkBox5_.isChecked() == true)
 							myWorkoutList_.setText(myWorkoutList_.getText() + "\n" +resultChkBox5_.getText());
-						if(resultChkBox6_.isChecked() == true)
-							myWorkoutList_.setText(myWorkoutList_.getText() + "\n" +resultChkBox6_.getText());
-					}
+						}
 				});
 				
 				clearButton_.setOnClickListener(new OnClickListener() {
@@ -222,16 +570,19 @@ public class MainActivity extends Activity {
 	        
 	    try {
 	    	Log.d(tag, "start connecting the Url ... " );
-	        //URL url = new URL("http", "www.bodybuilding.com", 80, "/exercises/list/muscle/selected/abdominals" ); 
+	    	//myurl = "data";
 	        URL url = new URL("http", "www.bodybuilding.com", 80, "/exercises/list/muscle/selected/"+myurl ); 
-	    	
+	        //URL url = new URL("http", "www.bodybuilding.com", 80, "/exercises" ); 
+	        //URL url = new URL("http://10.0.2.2:8080/data" ); 
 	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
 	        conn.setRequestMethod("GET");
 	        conn.setDoInput(true);
 	        // Starts the query
+	        Log.d(tag, "before connecting ... " );
 	        conn.connect();
+	        Log.d(tag, "after connecting ... " );
 	        int response = conn.getResponseCode();
 	        Log.d(tag, "The response is: " + response);
 	        
@@ -262,5 +613,3 @@ public class MainActivity extends Activity {
 	}
 
 }
-
-//

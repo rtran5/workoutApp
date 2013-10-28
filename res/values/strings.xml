@@ -4,5 +4,9 @@
     <string name="app_name">WorkoutAppDemo</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_second">SecondActivity</string>
+    <string name="title_activity_workout">WorkoutActivity</string>
+    <string name="title_activity_third">ThirdActivity</string>
 
 </resources>
